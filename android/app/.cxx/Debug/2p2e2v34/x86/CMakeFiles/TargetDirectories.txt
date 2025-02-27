@@ -1,0 +1,2 @@
+C:/CPS/CURSOS/FLUTTER/BASICO/OCTUBRE_2024/Recursos/ProyectoCompleto/finanzaspersonales/android/app/.cxx/Debug/2p2e2v34/x86/CMakeFiles/edit_cache.dir
+C:/CPS/CURSOS/FLUTTER/BASICO/OCTUBRE_2024/Recursos/ProyectoCompleto/finanzaspersonales/android/app/.cxx/Debug/2p2e2v34/x86/CMakeFiles/rebuild_cache.dir
