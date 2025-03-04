@@ -60,22 +60,145 @@ class _NuevoMovimientoPageState extends State<NuevoMovimientoPage> {
     }
   }
 
+  PreferredSizeWidget _widgetAppBar(){
+    return AppBar(
+      leading: InkWell(
+          onTap: (){
+            Navigator.pop(context);
+          },
+          child: Icon(Icons.chevron_left, size: 30)
+      ),
+      title: Text(
+          widget.movimientoId == null ?
+          'Registrar Movimiento' : 'Editar Movimiento',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w500)
+      ),
+    );
+  }
+
+  Widget _widgetTextFieldDescription(){
+    return TextFormField(
+      controller: _descripcionController,
+      decoration: InputDecoration(
+        labelText: 'Descripción',
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.blueAccent),
+        ),
+        filled: true,
+        fillColor: Colors.white,
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Por favor, ingrese una descripción';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _widgetTextFieldMonto(){
+    return TextFormField(
+      controller: _montoController,
+      decoration: InputDecoration(
+        labelText: 'Monto',
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.blueAccent),
+        ),
+        filled: true,
+        fillColor: Colors.white,
+      ),
+      keyboardType: TextInputType.number,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Por favor, ingrese un monto';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _widgetTextFieldFecha(){
+    return TextFormField(
+      controller: _fechaController,
+      decoration: InputDecoration(
+        labelText: 'Fecha',
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.blueAccent),
+        ),
+        filled: true,
+        fillColor: Colors.white,
+        suffixIcon: IconButton(
+          icon: Icon(Icons.calendar_today),
+          onPressed: _selectDate,
+        ),
+      ),
+      readOnly: true, // Evita que el usuario edite el campo directamente
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Por favor, seleccione una fecha';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _widgetDropdownTipoMovimiento(){
+    return DropdownButtonFormField<String>(
+      value: _tipo,
+      decoration: InputDecoration(
+        labelText: 'Tipo',
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.blueAccent),
+        ),
+        filled: true,
+        fillColor: Colors.white,
+      ),
+      items: [
+        DropdownMenuItem(value: 'ingreso', child: Text('Ingreso')),
+        DropdownMenuItem(value: 'gasto', child: Text('Gasto')),
+      ],
+      onChanged: (value) {
+        setState(() {
+          _tipo = value!;
+        });
+      },
+    );
+  }
+
+  Widget _widgetButtonSave(){
+    return ElevatedButton(
+      onPressed: () {
+        if (_formKey.currentState!.validate()) {
+          _formKey.currentState!.save();
+          _registrarOActualizarMovimiento(context);
+        }
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: primaryDark,
+        padding: EdgeInsets.symmetric(vertical: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        textStyle: TextStyle(fontSize: 18),
+      ),
+      child: Text(
+        widget.movimientoId == null ?
+        'Registrar' : 'Actualizar',
+        style: TextStyle(
+            color: Colors.white
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: InkWell(
-            onTap: (){
-              Navigator.pop(context);
-            },
-            child: Icon(Icons.chevron_left, size: 30)
-        ),
-        title: Text(
-            widget.movimientoId == null ?
-            'Registrar Movimiento' : 'Editar Movimiento',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w500)
-        ),
-      ),
+      appBar: _widgetAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -83,125 +206,18 @@ class _NuevoMovimientoPageState extends State<NuevoMovimientoPage> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                // Campo de Descripción
-                TextFormField(
-                  controller: _descripcionController,
-                  decoration: InputDecoration(
-                    labelText: 'Descripción',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.blueAccent),
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor, ingrese una descripción';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 16),
-
-                // Campo de Monto
-                TextFormField(
-                  controller: _montoController,
-                  decoration: InputDecoration(
-                    labelText: 'Monto',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.blueAccent),
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                  ),
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor, ingrese un monto';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 16),
-
-                // Campo de Fecha
-                TextFormField(
-                  controller: _fechaController,
-                  decoration: InputDecoration(
-                    labelText: 'Fecha',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.blueAccent),
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    suffixIcon: IconButton(
-                      icon: Icon(Icons.calendar_today),
-                      onPressed: _selectDate,
-                    ),
-                  ),
-                  readOnly: true, // Evita que el usuario edite el campo directamente
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor, seleccione una fecha';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 16),
-
-                // Selector de Tipo
-                DropdownButtonFormField<String>(
-                  value: _tipo,
-                  decoration: InputDecoration(
-                    labelText: 'Tipo',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.blueAccent),
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                  ),
-                  items: [
-                    DropdownMenuItem(value: 'ingreso', child: Text('Ingreso')),
-                    DropdownMenuItem(value: 'gasto', child: Text('Gasto')),
-                  ],
-                  onChanged: (value) {
-                    setState(() {
-                      _tipo = value!;
-                    });
-                  },
-                ),
-                SizedBox(height: 20),
-
+                _widgetTextFieldDescription(),
+                SizedBox(height: defaultSpacing),
+                _widgetTextFieldMonto(),
+                SizedBox(height: defaultSpacing),
+                _widgetTextFieldFecha(),
+                SizedBox(height: defaultSpacing),
+                _widgetDropdownTipoMovimiento(),
+                SizedBox(height: defaultSpacing),
                 // Botón de Registro/Actualización
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        _formKey.currentState!.save();
-                        _registrarOActualizarMovimiento(context);
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryDark,
-                      padding: EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      textStyle: TextStyle(fontSize: 18),
-                    ),
-                    child: Text(
-                        widget.movimientoId == null ?
-                        'Registrar' : 'Actualizar',
-                      style: TextStyle(
-                        color: Colors.white
-                      ),
-                    ),
-                  ),
+                  child: _widgetButtonSave()
                 ),
               ],
             ),
