@@ -1,37 +1,58 @@
 import 'package:finanzaspersonales/model/movimiento.dart';
 import 'package:finanzaspersonales/pages/nuevo_movimiento/nuevo_movimiento_page.dart';
+import 'package:finanzaspersonales/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'movimientos_provider.dart';
 import 'package:intl/intl.dart';
 
 class MovimientosPage extends StatelessWidget {
+
+  const MovimientosPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Todos los Movimientos'),
+        title: Text(
+            'Todos los Movimientos',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w500)
+        ),
       ),
-      body: Consumer<MovimientosProvider>(
-        builder: (context, provider, child) {
-          return provider.todosMovimientos.isNotEmpty
-              ? ListView.builder(
-            itemCount: provider.todosMovimientos.length,
-            itemBuilder: (context, index) {
-              final movimiento = provider.todosMovimientos[index];
-              return _buildMovimientoTile(movimiento, context, provider);
-            },
-          )
-              : Center(child: Text('No hay movimientos registrados.'));
-        },
+      body: Container(
+        padding: EdgeInsets.all(defaultSpacing),
+        child: Consumer<MovimientosProvider>(
+          builder: (context, provider, child) {
+            return provider.todosMovimientos.isNotEmpty
+                ? ListView.builder(
+              itemCount: provider.todosMovimientos.length,
+              itemBuilder: (context, index) {
+                final movimiento = provider.todosMovimientos[index];
+                return _buildMovimientoTile(movimiento, context, provider);
+              },
+            )
+                : Center(child: Text('No hay movimientos registrados.'));
+          },
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+          onPressed: (){
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => NuevoMovimientoPage()),
+            );
+          },
+          backgroundColor: primaryDark,
+          child: Icon(
+              Icons.add,
+              color: Colors.white,
+          ),
       ),
     );
   }
 
   Widget _buildMovimientoTile(Movimiento movimiento, BuildContext context, MovimientosProvider provider) {
-    // Formatear la fecha
     final formattedDate = DateFormat('dd/MM/yyyy').format(DateTime.parse(movimiento.fecha));
-
     return Dismissible(
       key: Key(movimiento.id.toString()), // Asegúrate de que el ID sea único
       direction: DismissDirection.endToStart,
@@ -69,6 +90,7 @@ class MovimientosPage extends StatelessWidget {
               style: TextStyle(
                 color: movimiento.tipo == 'ingreso' ? Colors.green : Colors.red,
                 fontWeight: FontWeight.bold,
+                fontSize: fontSizeBody
               ),
             ),
           ),

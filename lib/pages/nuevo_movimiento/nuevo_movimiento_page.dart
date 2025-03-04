@@ -1,6 +1,7 @@
 import 'package:finanzaspersonales/model/movimiento.dart';
 import 'package:finanzaspersonales/pages/nuevo_movimiento/nuevo_movimiento_provider.dart';
 import 'package:finanzaspersonales/repositories/movimiento_repository.dart';
+import 'package:finanzaspersonales/util/constants.dart';
 import 'package:finanzaspersonales/util/date_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -63,8 +64,17 @@ class _NuevoMovimientoPageState extends State<NuevoMovimientoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.movimientoId == null ? 'Registrar Movimiento' : 'Editar Movimiento'),
-        backgroundColor: Colors.blueAccent,
+        leading: InkWell(
+            onTap: (){
+              Navigator.pop(context);
+            },
+            child: Icon(Icons.chevron_left, size: 30)
+        ),
+        title: Text(
+            widget.movimientoId == null ?
+            'Registrar Movimiento' : 'Editar Movimiento',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w500)
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -177,14 +187,20 @@ class _NuevoMovimientoPageState extends State<NuevoMovimientoPage> {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
+                      backgroundColor: primaryDark,
                       padding: EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                       textStyle: TextStyle(fontSize: 18),
                     ),
-                    child: Text(widget.movimientoId == null ? 'Registrar' : 'Actualizar'),
+                    child: Text(
+                        widget.movimientoId == null ?
+                        'Registrar' : 'Actualizar',
+                      style: TextStyle(
+                        color: Colors.white
+                      ),
+                    ),
                   ),
                 ),
               ],

@@ -168,6 +168,7 @@ class DashboardPage extends StatelessWidget {
           style: TextStyle(
             color: movimiento.tipo == 'ingreso' ? Colors.green : Colors.red,
             fontWeight: FontWeight.bold,
+            fontSize: fontSizeBody
           ),
         ),
       ),
