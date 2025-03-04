@@ -9,6 +9,5 @@ class AppRoutes {
   static final Map<String, WidgetBuilder> routes = {
     home: (context) => HomePage(),
     dashboard: (context) => DashboardPage(),
-    // Agregar más rutas si es necesario
   };
 }
