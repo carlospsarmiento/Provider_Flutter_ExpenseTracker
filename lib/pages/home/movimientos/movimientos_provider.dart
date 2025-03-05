@@ -21,7 +21,6 @@ class MovimientosProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Método para eliminar un movimiento
   Future<void> eliminarMovimiento(int? id) async {
     if (id != null) {
       await _movimientoRepository.eliminarMovimiento(id);

@@ -260,7 +260,7 @@ class _NuevoMovimientoPageState extends State<NuevoMovimientoPage> {
       } else {
         await nuevoMovimientoProvider.actualizarMovimiento(movimiento);
       }
-      Navigator.pop(context);
+      Navigator.pop(context, true);
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al registrar/actualizar el movimiento: $error')),

@@ -1,4 +1,5 @@
 import 'package:finanzaspersonales/model/movimiento.dart';
+import 'package:finanzaspersonales/pages/home/home_provider.dart';
 import 'package:finanzaspersonales/pages/nuevo_movimiento/nuevo_movimiento_page.dart';
 import 'package:finanzaspersonales/util/constants.dart';
 import 'package:flutter/material.dart';
@@ -6,9 +7,26 @@ import 'package:provider/provider.dart';
 import 'dashboard_provider.dart';
 import 'package:intl/intl.dart';
 
-class DashboardPage extends StatelessWidget {
+class DashboardPage extends StatefulWidget {
 
   const DashboardPage({super.key});
+
+  @override
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> {
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _loadLatestMoves();
+  }
+
+  void _loadLatestMoves() async {
+    await Provider.of<HomeProvider>(context,listen: false).cargarDashboard();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +34,7 @@ class DashboardPage extends StatelessWidget {
       //appBar: _widgetAppBar(context),
       body: SafeArea(
         child: Container(
-          child: Consumer<DashboardProvider>(
+          child: Consumer<HomeProvider>(
             builder: (context, provider, child) {
               return Padding(
                 padding: const EdgeInsets.all(defaultSpacing),
@@ -56,7 +74,7 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
-  Widget _widgetListLatestMoves(DashboardProvider provider){
+  Widget _widgetListLatestMoves(HomeProvider provider){
     return Expanded(
       child: provider.ultimosMovimientos.isNotEmpty
           ? ListView.builder(

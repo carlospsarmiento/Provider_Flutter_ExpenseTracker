@@ -1,4 +1,5 @@
 import 'package:finanzaspersonales/model/movimiento.dart';
+import 'package:finanzaspersonales/pages/home/home_provider.dart';
 import 'package:finanzaspersonales/pages/nuevo_movimiento/nuevo_movimiento_page.dart';
 import 'package:finanzaspersonales/util/constants.dart';
 import 'package:flutter/material.dart';
@@ -6,9 +7,26 @@ import 'package:provider/provider.dart';
 import 'movimientos_provider.dart';
 import 'package:intl/intl.dart';
 
-class MovimientosPage extends StatelessWidget {
+class MovimientosPage extends StatefulWidget {
 
   const MovimientosPage({super.key});
+
+  @override
+  State<MovimientosPage> createState() => _MovimientosPageState();
+}
+
+class _MovimientosPageState extends State<MovimientosPage> {
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _loadMovements();
+  }
+
+  void _loadMovements() async{
+    await Provider.of<HomeProvider>(context,listen: false).loadMovimientos();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,13 +39,13 @@ class MovimientosPage extends StatelessWidget {
       ),
       body: Container(
         padding: EdgeInsets.all(defaultSpacing),
-        child: Consumer<MovimientosProvider>(
+        child: Consumer<HomeProvider>(
           builder: (context, provider, child) {
-            return provider.todosMovimientos.isNotEmpty
+            return provider.movimientos.isNotEmpty
                 ? ListView.builder(
-              itemCount: provider.todosMovimientos.length,
+              itemCount: provider.movimientos.length,
               itemBuilder: (context, index) {
-                final movimiento = provider.todosMovimientos[index];
+                final movimiento = provider.movimientos[index];
                 return _buildMovimientoTile(movimiento, context, provider);
               },
             )
@@ -51,7 +69,7 @@ class MovimientosPage extends StatelessWidget {
     );
   }
 
-  Widget _buildMovimientoTile(Movimiento movimiento, BuildContext context, MovimientosProvider provider) {
+  Widget _buildMovimientoTile(Movimiento movimiento, BuildContext context, HomeProvider provider) {
     final formattedDate = DateFormat('dd/MM/yyyy').format(DateTime.parse(movimiento.fecha));
     return Dismissible(
       key: Key(movimiento.id.toString()), // Asegúrate de que el ID sea único
@@ -69,11 +87,14 @@ class MovimientosPage extends StatelessWidget {
         );
       },
       child: GestureDetector(
-        onTap: () {
-          Navigator.push(
+        onTap: () async{
+          dynamic result =  await Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => NuevoMovimientoPage(movimientoId: movimiento.id)),
           );
+          if(result == true){
+            _loadMovements();
+          }
         },
         child: Card(
           margin: EdgeInsets.symmetric(vertical: 5),

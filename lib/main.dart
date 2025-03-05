@@ -1,4 +1,5 @@
 import 'package:finanzaspersonales/pages/home/dashboard/dashboard_provider.dart';
+import 'package:finanzaspersonales/pages/home/home_provider.dart';
 import 'package:finanzaspersonales/pages/home/movimientos/movimientos_provider.dart';
 import 'package:finanzaspersonales/pages/nuevo_movimiento/nuevo_movimiento_provider.dart';
 import 'package:finanzaspersonales/util/app_routes.dart';
@@ -17,6 +18,8 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (context) => NuevoMovimientoProvider()),
+          ChangeNotifierProvider(create: (context) => HomeProvider()),
+          /*
           ChangeNotifierProxyProvider<NuevoMovimientoProvider,MovimientosProvider>(
               create: (ctx) => MovimientosProvider(),
               update: (ctx, nuevoProvider, movimientosProvider) => movimientosProvider!..loadMovimientos()
@@ -29,6 +32,7 @@ class MyApp extends StatelessWidget {
               return dashboardProvider;
             },
           ),
+          */
         ],
       child: MaterialApp(
         title: 'Finanzas Personales',
