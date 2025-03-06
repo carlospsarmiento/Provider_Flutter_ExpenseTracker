@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-class CustomWidgetAppBar extends StatelessWidget implements PreferredSizeWidget {
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final bool canGoBack;
-  const CustomWidgetAppBar({
+  const CustomAppBar({
     super.key,
     required this.title,
     this.canGoBack = true

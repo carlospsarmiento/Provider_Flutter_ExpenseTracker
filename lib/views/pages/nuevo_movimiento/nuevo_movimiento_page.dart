@@ -3,7 +3,8 @@ import 'package:finanzaspersonales/views/pages/nuevo_movimiento/nuevo_movimiento
 import 'package:finanzaspersonales/repositories/movimiento_repository.dart';
 import 'package:finanzaspersonales/util/constants.dart';
 import 'package:finanzaspersonales/util/date_helper.dart';
-import 'package:finanzaspersonales/views/widgets/custom_widget_appbar.dart';
+import 'package:finanzaspersonales/views/widgets/custom_appbar.dart';
+import 'package:finanzaspersonales/views/widgets/custom_textformfield.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -25,7 +26,7 @@ class _NuevoMovimientoPageState extends State<NuevoMovimientoPage> {
   final TextEditingController _fechaController = TextEditingController();
 
   // Definimos un ValueNotifier para el campo _tipo
-  ValueNotifier<String> _tipoNotifier = ValueNotifier<String>('ingreso'); // Valor por defecto
+  final ValueNotifier<String> _tipoNotifier = ValueNotifier<String>('ingreso'); // Valor por defecto
 
   @override
   void initState() {
@@ -50,26 +51,9 @@ class _NuevoMovimientoPageState extends State<NuevoMovimientoPage> {
   }
 
   void _cargarMovimiento(int id) async {
-    //final movimientoRepository = MovimientoRepository();
     final nuevoMovimientoProvider = Provider.of<NuevoMovimientoProvider>(context, listen: false);
     try {
       await nuevoMovimientoProvider.cargarMovimiento(id);
-      //final movimiento = await nuevoMovimientoProvider.obtenerMovimientoPorId(id);
-      /*
-      if (movimiento != null) {
-        setState(() {
-          _descripcionController.text = movimiento.descripcion;
-          _montoController.text = movimiento.cantidad.toString();
-          _tipo = movimiento.tipo;
-          _fechaController.text = DateHelper.formatearDesdeDatabase(movimiento.fecha); // Mostrar fecha formateada
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Movimiento no encontrado')),
-        );
-        Navigator.pop(context);
-      }
-      */
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al cargar el movimiento: $error')),
@@ -78,39 +62,23 @@ class _NuevoMovimientoPageState extends State<NuevoMovimientoPage> {
   }
 
   Widget _widgetTextFieldDescription(){
-    return TextFormField(
-      controller: _descripcionController,
-      decoration: InputDecoration(
-        labelText: 'Descripción',
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.blueAccent),
-        ),
-        filled: true,
-        fillColor: Colors.white,
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Por favor, ingrese una descripción';
-        }
-        return null;
-      },
+    return CustomTextFormField(
+        controller: _descripcionController,
+        labelText: "Descripción",
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Por favor, ingrese una descripción';
+          }
+          return null;
+        },
     );
   }
 
   Widget _widgetTextFieldMonto(){
-    return TextFormField(
-      controller: _montoController,
-      decoration: InputDecoration(
-        labelText: 'Monto',
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.blueAccent),
-        ),
-        filled: true,
-        fillColor: Colors.white,
-      ),
-      keyboardType: TextInputType.number,
+    return CustomTextFormField(
+      controller: _descripcionController,
+      labelText: "Monto",
+      inputType: TextInputType.number,
       validator: (value) {
         if (value == null || value.isEmpty) {
           return 'Por favor, ingrese un monto';
@@ -207,7 +175,7 @@ class _NuevoMovimientoPageState extends State<NuevoMovimientoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomWidgetAppBar(
+      appBar: CustomAppBar(
           title: widget.movimientoId == null ?
           'Registrar Movimiento' : 'Editar Movimiento'),
       body: Padding(
