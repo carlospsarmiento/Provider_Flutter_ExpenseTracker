@@ -18,10 +18,13 @@ class NuevoMovimientoPage extends StatefulWidget {
 
 class _NuevoMovimientoPageState extends State<NuevoMovimientoPage> {
   final _formKey = GlobalKey<FormState>();
-  String _tipo = 'ingreso';
+  //String _tipo = 'ingreso';
   final TextEditingController _descripcionController = TextEditingController();
   final TextEditingController _montoController = TextEditingController();
   final TextEditingController _fechaController = TextEditingController();
+
+  // Definimos un ValueNotifier para el campo _tipo
+  ValueNotifier<String> _tipoNotifier = ValueNotifier<String>('ingreso'); // Valor por defecto
 
   @override
   void initState() {
@@ -29,17 +32,29 @@ class _NuevoMovimientoPageState extends State<NuevoMovimientoPage> {
     if (widget.movimientoId != null) {
       _cargarMovimiento(widget.movimientoId!);
     } else {
+      _limpiarMovimiento();
       // Si es un nuevo movimiento, colocar la fecha actual
+      /*
       _fechaController.text = DateHelper.formatearDesdeDatabase(DateTime.now().toIso8601String());
+      _descripcionController.clear();
+      _montoController.clear();
+      _tipo = 'ingreso';
+      */
     }
+  }
+
+  void _limpiarMovimiento() async{
+    final nuevoMovimientoProvider = Provider.of<NuevoMovimientoProvider>(context, listen: false);
+    nuevoMovimientoProvider.limpiarMovimiento();
   }
 
   void _cargarMovimiento(int id) async {
     //final movimientoRepository = MovimientoRepository();
     final nuevoMovimientoProvider = Provider.of<NuevoMovimientoProvider>(context, listen: false);
     try {
-      final movimiento = await nuevoMovimientoProvider.obtenerMovimientoPorId(id);
-
+      await nuevoMovimientoProvider.cargarMovimiento(id);
+      //final movimiento = await nuevoMovimientoProvider.obtenerMovimientoPorId(id);
+      /*
       if (movimiento != null) {
         setState(() {
           _descripcionController.text = movimiento.descripcion;
@@ -53,6 +68,7 @@ class _NuevoMovimientoPageState extends State<NuevoMovimientoPage> {
         );
         Navigator.pop(context);
       }
+      */
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al cargar el movimiento: $error')),
@@ -146,26 +162,34 @@ class _NuevoMovimientoPageState extends State<NuevoMovimientoPage> {
   }
 
   Widget _widgetDropdownTipoMovimiento(){
-    return DropdownButtonFormField<String>(
-      value: _tipo,
-      decoration: InputDecoration(
-        labelText: 'Tipo',
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.blueAccent),
-        ),
-        filled: true,
-        fillColor: Colors.white,
-      ),
-      items: [
-        DropdownMenuItem(value: 'ingreso', child: Text('Ingreso')),
-        DropdownMenuItem(value: 'gasto', child: Text('Gasto')),
-      ],
-      onChanged: (value) {
-        setState(() {
-          _tipo = value!;
-        });
-      },
+    return ValueListenableBuilder(
+      valueListenable: _tipoNotifier,
+      builder: (context, tipo, child){
+        return DropdownButtonFormField<String>(
+          value: _tipoNotifier.value,
+          decoration: InputDecoration(
+            labelText: 'Tipo',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: Colors.blueAccent),
+            ),
+            filled: true,
+            fillColor: Colors.white,
+          ),
+          items: [
+            DropdownMenuItem(value: 'ingreso', child: Text('Ingreso')),
+            DropdownMenuItem(value: 'gasto', child: Text('Gasto')),
+          ],
+          onChanged: (value) {
+            /*
+            setState(() {
+              _tipo = value!;
+            });
+            */
+            _tipoNotifier.value = value!;
+          },
+        );
+      }
     );
   }
 
@@ -201,27 +225,46 @@ class _NuevoMovimientoPageState extends State<NuevoMovimientoPage> {
       appBar: _widgetAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                _widgetTextFieldDescription(),
-                SizedBox(height: defaultSpacing),
-                _widgetTextFieldMonto(),
-                SizedBox(height: defaultSpacing),
-                _widgetTextFieldFecha(),
-                SizedBox(height: defaultSpacing),
-                _widgetDropdownTipoMovimiento(),
-                SizedBox(height: defaultSpacing),
-                // Botón de Registro/Actualización
-                SizedBox(
-                  width: double.infinity,
-                  child: _widgetButtonSave()
+        child: Consumer<NuevoMovimientoProvider>(
+          builder: (context, provider, child){
+            // Aquí se obtienen los valores del movimiento si ya se ha cargado
+            final movimiento = provider.movimiento;
+
+            if (movimiento != null) {
+              _descripcionController.text = movimiento.descripcion;
+              _montoController.text = movimiento.cantidad.toString();
+              _tipoNotifier.value = movimiento.tipo;
+              _fechaController.text = DateHelper.formatearDesdeDatabase(movimiento.fecha);
+            }
+            else{
+              _descripcionController.clear();
+              _montoController.clear();
+              _tipoNotifier.value = "ingreso";
+              _fechaController.text = DateHelper.formatearDesdeDatabase(DateTime.now().toIso8601String());
+            }
+            return Form(
+              key: _formKey,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _widgetTextFieldDescription(),
+                    SizedBox(height: defaultSpacing),
+                    _widgetTextFieldMonto(),
+                    SizedBox(height: defaultSpacing),
+                    _widgetTextFieldFecha(),
+                    SizedBox(height: defaultSpacing),
+                    _widgetDropdownTipoMovimiento(),
+                    SizedBox(height: defaultSpacing),
+                    // Botón de Registro/Actualización
+                    SizedBox(
+                        width: double.infinity,
+                        child: _widgetButtonSave()
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -251,7 +294,7 @@ class _NuevoMovimientoPageState extends State<NuevoMovimientoPage> {
       descripcion: _descripcionController.text,
       cantidad: double.tryParse(_montoController.text) ?? 0.0,
       fecha: DateHelper.convertirADatabase(_fechaController.text),
-      tipo: _tipo,
+      tipo: _tipoNotifier.value,
     );
 
     try {

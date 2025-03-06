@@ -8,14 +8,15 @@ class NuevoMovimientoProvider with ChangeNotifier {
   final MovimientoRepository _movimientoRepository = MovimientoRepository();
   //final MovimientoApiRepository _movimientoRepository = MovimientoApiRepository();
 
+  Movimiento? _movimiento;
+  Movimiento? get movimiento => _movimiento;
+
   // Método para registrar un nuevo movimiento
   Future<void> registrarMovimiento(Movimiento movimiento) async {
     try {
       await _movimientoRepository.insertarMovimiento(movimiento); // Llama al método del repositorio
-
       notifyListeners(); // Notificar a la UI si es necesario
     } catch (error) {
-      // Manejo de errores, podrías lanzar una excepción o mostrar un mensaje
       throw error;
     }
   }
@@ -29,11 +30,17 @@ class NuevoMovimientoProvider with ChangeNotifier {
     }
   }
 
-  Future<Movimiento?> obtenerMovimientoPorId(int id) async {
+  Future<void> cargarMovimiento(int id) async {
     try {
-      return await _movimientoRepository.obtenerMovimientoPorId(id);
+      _movimiento = await _movimientoRepository.obtenerMovimientoPorId(id);
+      notifyListeners(); // Notificar a los listeners cuando se cargue el movimiento
     } catch (error) {
       throw error;
     }
+  }
+
+  void limpiarMovimiento() {
+    _movimiento = null;
+    notifyListeners();  // Notificar que el movimiento ha sido limpiado
   }
 }
