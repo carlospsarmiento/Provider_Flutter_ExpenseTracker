@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 
 class NuevoMovimientoProvider with ChangeNotifier {
 
-  final MovimientoRepository _movimientoRepository = MovimientoRepository();
-  //final MovimientoApiRepository _movimientoRepository = MovimientoApiRepository();
+  //final MovimientoRepository _movimientoRepository = MovimientoRepository();
+  final MovimientoApiRepository _movimientoRepository = MovimientoApiRepository();
 
   Movimiento? _movimiento;
   Movimiento? get movimiento => _movimiento;

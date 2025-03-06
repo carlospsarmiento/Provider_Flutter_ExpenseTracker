@@ -1,11 +1,12 @@
 import 'package:finanzaspersonales/model/movimiento.dart';
+import 'package:finanzaspersonales/repositories/movimiento_api_repository.dart';
 import 'package:finanzaspersonales/repositories/movimiento_repository.dart';
 import 'package:flutter/material.dart';
 
 class HomeProvider extends ChangeNotifier{
 
-  final MovimientoRepository _movimientoRepository = MovimientoRepository();
-//final MovimientoApiRepository _movimientoRepository = MovimientoApiRepository();
+  //final MovimientoRepository _movimientoRepository = MovimientoRepository();
+  final MovimientoApiRepository _movimientoRepository = MovimientoApiRepository();
 
   /// DASHBOARD
   double _saldo = 0;

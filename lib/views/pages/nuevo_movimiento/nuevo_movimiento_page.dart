@@ -1,8 +1,9 @@
 import 'package:finanzaspersonales/model/movimiento.dart';
-import 'package:finanzaspersonales/pages/nuevo_movimiento/nuevo_movimiento_provider.dart';
+import 'package:finanzaspersonales/views/pages/nuevo_movimiento/nuevo_movimiento_provider.dart';
 import 'package:finanzaspersonales/repositories/movimiento_repository.dart';
 import 'package:finanzaspersonales/util/constants.dart';
 import 'package:finanzaspersonales/util/date_helper.dart';
+import 'package:finanzaspersonales/views/widgets/custom_widget_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -74,22 +75,6 @@ class _NuevoMovimientoPageState extends State<NuevoMovimientoPage> {
         SnackBar(content: Text('Error al cargar el movimiento: $error')),
       );
     }
-  }
-
-  PreferredSizeWidget _widgetAppBar(){
-    return AppBar(
-      leading: InkWell(
-          onTap: (){
-            Navigator.pop(context);
-          },
-          child: Icon(Icons.chevron_left, size: 30)
-      ),
-      title: Text(
-          widget.movimientoId == null ?
-          'Registrar Movimiento' : 'Editar Movimiento',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w500)
-      ),
-    );
   }
 
   Widget _widgetTextFieldDescription(){
@@ -222,7 +207,9 @@ class _NuevoMovimientoPageState extends State<NuevoMovimientoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _widgetAppBar(),
+      appBar: CustomWidgetAppBar(
+          title: widget.movimientoId == null ?
+          'Registrar Movimiento' : 'Editar Movimiento'),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Consumer<NuevoMovimientoProvider>(

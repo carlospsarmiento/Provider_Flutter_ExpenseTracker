@@ -4,7 +4,7 @@ import 'package:finanzaspersonales/model/movimiento.dart';
 
 class MovimientoApiRepository {
   //final String baseUrl = 'http://localhost:3000/movimientos';
-  final String baseUrl = "https://wdqjjd59-5000.brs.devtunnels.ms/movimientos";
+  final String baseUrl = "https://f2mrv4dr-5000.brs.devtunnels.ms/movimientos";
 
   // Insertar un nuevo movimiento en el servidor
   Future<Movimiento?> insertarMovimiento(Movimiento movimiento) async {

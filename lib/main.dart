@@ -1,7 +1,7 @@
-import 'package:finanzaspersonales/pages/home/dashboard/dashboard_provider.dart';
-import 'package:finanzaspersonales/pages/home/home_provider.dart';
-import 'package:finanzaspersonales/pages/home/movimientos/movimientos_provider.dart';
-import 'package:finanzaspersonales/pages/nuevo_movimiento/nuevo_movimiento_provider.dart';
+import 'package:finanzaspersonales/views/pages/home/dashboard/dashboard_provider.dart';
+import 'package:finanzaspersonales/views/pages/home/home_provider.dart';
+import 'package:finanzaspersonales/views/pages/home/movimientos/movimientos_provider.dart';
+import 'package:finanzaspersonales/views/pages/nuevo_movimiento/nuevo_movimiento_provider.dart';
 import 'package:finanzaspersonales/util/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

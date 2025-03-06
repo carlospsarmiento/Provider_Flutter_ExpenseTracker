@@ -1,5 +1,5 @@
-import 'package:finanzaspersonales/pages/home/dashboard/dashboard_page.dart';
-import 'package:finanzaspersonales/pages/home/movimientos/movimientos_page.dart';
+import 'package:finanzaspersonales/views/pages/home/dashboard/dashboard_page.dart';
+import 'package:finanzaspersonales/views/pages/home/movimientos/movimientos_page.dart';
 import 'package:finanzaspersonales/util/constants.dart';
 import 'package:flutter/material.dart';
 

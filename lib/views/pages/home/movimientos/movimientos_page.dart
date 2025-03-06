@@ -1,6 +1,6 @@
 import 'package:finanzaspersonales/model/movimiento.dart';
-import 'package:finanzaspersonales/pages/home/home_provider.dart';
-import 'package:finanzaspersonales/pages/nuevo_movimiento/nuevo_movimiento_page.dart';
+import 'package:finanzaspersonales/views/pages/home/home_provider.dart';
+import 'package:finanzaspersonales/views/pages/nuevo_movimiento/nuevo_movimiento_page.dart';
 import 'package:finanzaspersonales/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
