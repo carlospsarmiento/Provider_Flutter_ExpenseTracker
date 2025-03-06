@@ -4,11 +4,11 @@ import 'package:finanzaspersonales/repositories/movimiento_repository.dart';
 import 'package:finanzaspersonales/util/constants.dart';
 import 'package:finanzaspersonales/util/date_helper.dart';
 import 'package:finanzaspersonales/views/widgets/custom_appbar.dart';
+import 'package:finanzaspersonales/views/widgets/custom_dropdown_string.dart';
 import 'package:finanzaspersonales/views/widgets/custom_textformfield.dart';
 import 'package:finanzaspersonales/views/widgets/custom_textformfield_date.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 
 class NuevoMovimientoPage extends StatefulWidget {
   final int? movimientoId;
@@ -111,29 +111,22 @@ class _NuevoMovimientoPageState extends State<NuevoMovimientoPage> {
   }
 
   Widget _widgetDropdownTipoMovimiento(){
-    return ValueListenableBuilder<String>(
+    return ValueListenableBuilder(
       valueListenable: _tipoNotifier,
-      builder: (context, tipo, child){
-        return DropdownButtonFormField<String>(
-          value: _tipoNotifier.value,
-          decoration: InputDecoration(
-            labelText: 'Tipo',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.blueAccent),
-            ),
-            filled: true,
-            fillColor: Colors.white,
-          ),
-          items: [
-            DropdownMenuItem(value: 'ingreso', child: Text('Ingreso')),
-            DropdownMenuItem(value: 'gasto', child: Text('Gasto')),
-          ],
-          onChanged: (value) {
-            _tipoNotifier.value = value!;
-          },
-        );
-      }
+      builder: (context, value, child){
+        return CustomDropdownString(
+            labelText: "Tipo de movimiento",
+            value: _tipoNotifier.value,
+            items: [
+              DropdownMenuItem(value: 'ingreso', child: Text('Ingreso')),
+              DropdownMenuItem(value: 'gasto', child: Text('Gasto')),
+            ],
+            onChanged: (value){
+              if(value!=null){
+                _tipoNotifier.value = value;
+              }
+            });
+      },
     );
   }
 
