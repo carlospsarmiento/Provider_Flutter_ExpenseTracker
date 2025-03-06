@@ -5,6 +5,7 @@ import 'package:finanzaspersonales/util/constants.dart';
 import 'package:finanzaspersonales/util/date_helper.dart';
 import 'package:finanzaspersonales/views/widgets/custom_appbar.dart';
 import 'package:finanzaspersonales/views/widgets/custom_textformfield.dart';
+import 'package:finanzaspersonales/views/widgets/custom_textformfield_date.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -27,22 +28,25 @@ class _NuevoMovimientoPageState extends State<NuevoMovimientoPage> {
 
   // Definimos un ValueNotifier para el campo _tipo
   final ValueNotifier<String> _tipoNotifier = ValueNotifier<String>('ingreso'); // Valor por defecto
+  final ValueNotifier<String> _fechaNotifier = ValueNotifier<String>('');
 
   @override
   void initState() {
     super.initState();
+    _inicializar();
+  }
+
+  void _inicializar(){
+    // carga de datos en el formulario
     if (widget.movimientoId != null) {
       _cargarMovimiento(widget.movimientoId!);
     } else {
       _limpiarMovimiento();
-      // Si es un nuevo movimiento, colocar la fecha actual
-      /*
-      _fechaController.text = DateHelper.formatearDesdeDatabase(DateTime.now().toIso8601String());
-      _descripcionController.clear();
-      _montoController.clear();
-      _tipo = 'ingreso';
-      */
     }
+    // eventos
+    _fechaController.addListener((){
+      _fechaNotifier.value = _fechaController.text;
+    });
   }
 
   void _limpiarMovimiento() async{
@@ -76,7 +80,7 @@ class _NuevoMovimientoPageState extends State<NuevoMovimientoPage> {
 
   Widget _widgetTextFieldMonto(){
     return CustomTextFormField(
-      controller: _descripcionController,
+      controller: _montoController,
       labelText: "Monto",
       inputType: TextInputType.number,
       validator: (value) {
@@ -89,33 +93,25 @@ class _NuevoMovimientoPageState extends State<NuevoMovimientoPage> {
   }
 
   Widget _widgetTextFieldFecha(){
-    return TextFormField(
-      controller: _fechaController,
-      decoration: InputDecoration(
-        labelText: 'Fecha',
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.blueAccent),
-        ),
-        filled: true,
-        fillColor: Colors.white,
-        suffixIcon: IconButton(
-          icon: Icon(Icons.calendar_today),
-          onPressed: _selectDate,
-        ),
-      ),
-      readOnly: true, // Evita que el usuario edite el campo directamente
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Por favor, seleccione una fecha';
-        }
-        return null;
+    return ValueListenableBuilder<String>(
+      valueListenable: _fechaNotifier,
+      builder: (context, value, child){
+        return CustomTextFormFieldDate(
+            controller: _fechaController,
+            labelText: "Fecha",
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Por favor, seleccione una fecha';
+              }
+              return null;
+            }
+        );
       },
     );
   }
 
   Widget _widgetDropdownTipoMovimiento(){
-    return ValueListenableBuilder(
+    return ValueListenableBuilder<String>(
       valueListenable: _tipoNotifier,
       builder: (context, tipo, child){
         return DropdownButtonFormField<String>(
@@ -134,11 +130,6 @@ class _NuevoMovimientoPageState extends State<NuevoMovimientoPage> {
             DropdownMenuItem(value: 'gasto', child: Text('Gasto')),
           ],
           onChanged: (value) {
-            /*
-            setState(() {
-              _tipo = value!;
-            });
-            */
             _tipoNotifier.value = value!;
           },
         );
@@ -151,7 +142,7 @@ class _NuevoMovimientoPageState extends State<NuevoMovimientoPage> {
       onPressed: () {
         if (_formKey.currentState!.validate()) {
           _formKey.currentState!.save();
-          _registrarOActualizarMovimiento(context);
+          _guardarMovimiento(context);
         }
       },
       style: ElevatedButton.styleFrom(
@@ -177,73 +168,60 @@ class _NuevoMovimientoPageState extends State<NuevoMovimientoPage> {
     return Scaffold(
       appBar: CustomAppBar(
           title: widget.movimientoId == null ?
-          'Registrar Movimiento' : 'Editar Movimiento'),
+          'Registrar Movimiento' : 'Editar Movimiento'
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Consumer<NuevoMovimientoProvider>(
           builder: (context, provider, child){
-            // Aquí se obtienen los valores del movimiento si ya se ha cargado
-            final movimiento = provider.movimiento;
-
-            if (movimiento != null) {
-              _descripcionController.text = movimiento.descripcion;
-              _montoController.text = movimiento.cantidad.toString();
-              _tipoNotifier.value = movimiento.tipo;
-              _fechaController.text = DateHelper.formatearDesdeDatabase(movimiento.fecha);
-            }
-            else{
-              _descripcionController.clear();
-              _montoController.clear();
-              _tipoNotifier.value = "ingreso";
-              _fechaController.text = DateHelper.formatearDesdeDatabase(DateTime.now().toIso8601String());
-            }
-            return Form(
-              key: _formKey,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    _widgetTextFieldDescription(),
-                    SizedBox(height: defaultSpacing),
-                    _widgetTextFieldMonto(),
-                    SizedBox(height: defaultSpacing),
-                    _widgetTextFieldFecha(),
-                    SizedBox(height: defaultSpacing),
-                    _widgetDropdownTipoMovimiento(),
-                    SizedBox(height: defaultSpacing),
-                    // Botón de Registro/Actualización
-                    SizedBox(
-                        width: double.infinity,
-                        child: _widgetButtonSave()
-                    ),
-                  ],
-                ),
-              ),
-            );
+            return _widgetForm(provider);
           },
         ),
       ),
     );
   }
 
-  // Método para seleccionar una fecha con el date picker
-  Future<void> _selectDate() async {
-    DateTime? selectedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-
-    if (selectedDate != null) {
-      setState(() {
-        _fechaController.text = DateHelper.formatearDesdeDatabase(selectedDate.toIso8601String());
-      });
+  Widget _widgetForm(NuevoMovimientoProvider provider){
+    // Aquí se obtienen los valores del movimiento si ya se ha cargado
+    final movimiento = provider.movimiento;
+    if (movimiento != null) {
+      _descripcionController.text = movimiento.descripcion;
+      _montoController.text = movimiento.cantidad.toString();
+      _tipoNotifier.value = movimiento.tipo;
+      _fechaController.text = DateHelper.formatearDesdeDatabase(movimiento.fecha);
     }
+    else{
+      _descripcionController.clear();
+      _montoController.clear();
+      _tipoNotifier.value = "ingreso";
+      _fechaController.text = DateHelper.formatearDesdeDatabase(DateTime.now().toIso8601String());
+    }
+    return Form(
+      key: _formKey,
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            _widgetTextFieldDescription(),
+            SizedBox(height: defaultSpacing),
+            _widgetTextFieldMonto(),
+            SizedBox(height: defaultSpacing),
+            _widgetTextFieldFecha(),
+            SizedBox(height: defaultSpacing),
+            _widgetDropdownTipoMovimiento(),
+            SizedBox(height: defaultSpacing),
+            // Botón de Registro/Actualización
+            SizedBox(
+                width: double.infinity,
+                child: _widgetButtonSave()
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
-  void _registrarOActualizarMovimiento(BuildContext context) async {
+  void _guardarMovimiento(BuildContext context) async {
     final nuevoMovimientoProvider = Provider.of<NuevoMovimientoProvider>(context, listen: false);
-
     final movimiento = Movimiento(
       id: widget.movimientoId,
       descripcion: _descripcionController.text,
@@ -251,7 +229,6 @@ class _NuevoMovimientoPageState extends State<NuevoMovimientoPage> {
       fecha: DateHelper.convertirADatabase(_fechaController.text),
       tipo: _tipoNotifier.value,
     );
-
     try {
       if (widget.movimientoId == null) {
         await nuevoMovimientoProvider.registrarMovimiento(movimiento);
