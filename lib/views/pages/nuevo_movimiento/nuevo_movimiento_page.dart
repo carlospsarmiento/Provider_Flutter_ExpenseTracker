@@ -1,9 +1,9 @@
 import 'package:finanzaspersonales/model/movimiento.dart';
 import 'package:finanzaspersonales/views/pages/nuevo_movimiento/nuevo_movimiento_provider.dart';
-import 'package:finanzaspersonales/repositories/movimiento_repository.dart';
 import 'package:finanzaspersonales/util/constants.dart';
 import 'package:finanzaspersonales/util/date_helper.dart';
 import 'package:finanzaspersonales/views/widgets/custom_appbar.dart';
+import 'package:finanzaspersonales/views/widgets/custom_button_primary.dart';
 import 'package:finanzaspersonales/views/widgets/custom_dropdown_string.dart';
 import 'package:finanzaspersonales/views/widgets/custom_textformfield.dart';
 import 'package:finanzaspersonales/views/widgets/custom_textformfield_date.dart';
@@ -21,7 +21,8 @@ class NuevoMovimientoPage extends StatefulWidget {
 
 class _NuevoMovimientoPageState extends State<NuevoMovimientoPage> {
   final _formKey = GlobalKey<FormState>();
-  //String _tipo = 'ingreso';
+
+  // Controllers para campos de texto
   final TextEditingController _descripcionController = TextEditingController();
   final TextEditingController _montoController = TextEditingController();
   final TextEditingController _fechaController = TextEditingController();
@@ -131,28 +132,15 @@ class _NuevoMovimientoPageState extends State<NuevoMovimientoPage> {
   }
 
   Widget _widgetButtonSave(){
-    return ElevatedButton(
-      onPressed: () {
-        if (_formKey.currentState!.validate()) {
-          _formKey.currentState!.save();
-          _guardarMovimiento(context);
-        }
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: primaryDark,
-        padding: EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        textStyle: TextStyle(fontSize: 18),
-      ),
-      child: Text(
-        widget.movimientoId == null ?
-        'Registrar' : 'Actualizar',
-        style: TextStyle(
-            color: Colors.white
-        ),
-      ),
+    return CustomButtonPrimary(
+        onPressed: (){
+          if (_formKey.currentState!.validate()) {
+            _formKey.currentState!.save();
+            _guardarMovimiento(context);
+          }
+        },
+        text: widget.movimientoId == null ?
+        'Registrar' : 'Actualizar'
     );
   }
 
